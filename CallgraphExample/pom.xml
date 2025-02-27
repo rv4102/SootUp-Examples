@@ -81,6 +81,17 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <compileSourceRoots>
+                        <compileSourceRoot>${project.basedir}/src/test/resources/Callgraph/source</compileSourceRoot>
+                    </compileSourceRoots>
+                    <outputDirectory>${project.basedir}/src/test/resources/Callgraph/binary</outputDirectory>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
