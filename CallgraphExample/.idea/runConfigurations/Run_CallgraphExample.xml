@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="CallgraphExample" type="Application" factoryName="Application" nameIsGenerated="true">
+  <configuration default="false" name="Run CallgraphExample" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="sootup.examples.CallgraphExample" />
     <module name="sootup.examples" />
     <extension name="coverage">
