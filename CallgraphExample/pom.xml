@@ -90,6 +90,8 @@
                         <compileSourceRoot>${project.basedir}/src/test/resources/Callgraph/source</compileSourceRoot>
                     </compileSourceRoots>
                     <outputDirectory>${project.basedir}/src/test/resources/Callgraph/binary</outputDirectory>
+                    <source>11</source>
+                    <target>11</target>
                 </configuration>
             </plugin>
         </plugins>
