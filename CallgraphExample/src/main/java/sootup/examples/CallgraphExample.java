@@ -10,6 +10,7 @@ import sootup.callgraph.CallGraphAlgorithm;
 import sootup.callgraph.ClassHierarchyAnalysisAlgorithm;
 import sootup.callgraph.RapidTypeAnalysisAlgorithm;
 import sootup.core.inputlocation.AnalysisInputLocation;
+import sootup.core.model.Body;
 import sootup.core.model.SourceType;
 import sootup.core.signatures.MethodSignature;
 import sootup.core.typehierarchy.ViewTypeHierarchy;
@@ -20,6 +21,7 @@ import sootup.core.types.ArrayType;
 import sootup.java.bytecode.frontend.inputlocation.JavaClassPathAnalysisInputLocation;
 import sootup.java.bytecode.frontend.inputlocation.JrtFileSystemAnalysisInputLocation;
 import sootup.java.core.JavaIdentifierFactory;
+import sootup.java.core.JavaSootMethod;
 import sootup.java.core.views.JavaView;
 
 import org.slf4j.LoggerFactory;
@@ -64,25 +66,27 @@ public class CallgraphExample {
 
     ClassType createAccountRequestActionType = view.getIdentifierFactory().getClassType("teammates.ui.webapi.CreateAccountRequestAction");
     MethodSignature entryMethodSignature = JavaIdentifierFactory.getInstance().getMethodSignature(
-        createAccountRequestActionType,
-        JavaIdentifierFactory.getInstance().getMethodSubSignature(
-            "execute",
-            view.getIdentifierFactory().getClassType("teammates.ui.webapi.JsonResult"),
-            Collections.emptyList()
-        )
+      createAccountRequestActionType,
+      JavaIdentifierFactory.getInstance().getMethodSubSignature(
+        "execute",
+        view.getIdentifierFactory().getClassType("teammates.ui.webapi.JsonResult"),
+        Collections.emptyList()
+      )
     );
+
+    printMethodBody(view, entryMethodSignature);
 
 //    // Create type hierarchy and CHA
 //    final ViewTypeHierarchy typeHierarchy = new ViewTypeHierarchy(view);
 //    typeHierarchy.subclassesOf(testClassType).forEach(System.out::println);
 
 
-    // Create CG by initializing CHA with entry method(s)
-    System.out.println("-------------CHA---------------");
-    CallGraphAlgorithm cha = new ClassHierarchyAnalysisAlgorithm(view);
-    CallGraph cg1 = cha.initialize(Collections.singletonList(entryMethodSignature));
-//    cg1.callsFrom(entryMethodSignature).forEach(System.out::println);
-    recursivePrint(entryMethodSignature, cg1, new HashSet<>(), "");
+//    // Create CG by initializing CHA with entry method(s)
+//    System.out.println("-------------CHA---------------");
+//    CallGraphAlgorithm cha = new ClassHierarchyAnalysisAlgorithm(view);
+//    CallGraph cg1 = cha.initialize(Collections.singletonList(entryMethodSignature));
+////    cg1.callsFrom(entryMethodSignature).forEach(System.out::println);
+//    recursivePrint(view, entryMethodSignature, cg1, new HashSet<>(), "");
 
 //    // Create CG by using RTA with entry method(s)
 //    System.out.println("-------------RTA---------------");
@@ -100,18 +104,31 @@ public class CallgraphExample {
 //    cg3.callsFrom(entryMethodSignature).forEach(System.out::println);
   }
 
-  public static void recursivePrint(MethodSignature m, CallGraph cg, HashSet<Integer> visited, String indent) {
-      // Base case: if the method has already been visited, return to avoid infinite recursion
-      if (visited.contains(m.hashCode())) {
-        return;
-      }
-      // Pretty print the node
-      System.out.println(indent + " -> " + m);
+  public static void printMethodBody(JavaView view, MethodSignature m) {
+    if(view.getMethod(m).isPresent()) {
+      Body body = view.getMethod(m).get().getBody();
+      System.out.println(view.getMethod(m).get().getBodySource());
+      System.out.println(body);
+    }
+    else {
+      System.out.println("Method not found");
+    }
+  }
 
-      // Mark the method as visited
-      visited.add(m.hashCode());
+  public static void recursivePrint(JavaView view, MethodSignature m, CallGraph cg, HashSet<Integer> visited, String indent) {
+    // Base case: if the method has already been visited, return to avoid infinite recursion
+    if (visited.contains(m.hashCode())) {
+      return;
+    }
 
-      // Pretty print the children with indentation
-      cg.callTargetsFrom(m).forEach(child -> recursivePrint(child, cg, visited, indent + "    "));
+    // Pretty print the node
+    System.out.println(indent + " -> " + m);
+    printMethodBody(view, m);
+
+    // Mark the method as visited
+    visited.add(m.hashCode());
+
+    // Pretty print the children with indentation
+    cg.callTargetsFrom(m).forEach(child -> recursivePrint(view, child, cg, visited, indent + "    "));
   }
 }
